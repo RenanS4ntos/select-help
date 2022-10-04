@@ -6,14 +6,28 @@ import Logo from "../assets/logo_primary.svg";
 
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
-import { Image } from "react-native-svg";
+import { Alert } from "react-native";
+import { useAuth } from "../hooks";
 
 export function SignIn() {
+  const { handleLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { colors } = useTheme();
+
+  async function handleSignIn() {
+    if (!email || !password) {
+      return Alert.alert("Entrar", "Informe e-mail e senha.");
+    }
+
+    setIsLoading(true);
+
+    await handleLogin({ email, password });
+
+    setIsLoading(false);
+  }
 
   return (
     <VStack flex={1} alignItems="center" bg="gray.600" px={8} pt={24}>
@@ -44,7 +58,7 @@ export function SignIn() {
         title="Entrar"
         w="full"
         onPress={() => {
-          console.log("Login");
+          handleSignIn();
         }}
         isLoading={isLoading}
       />
