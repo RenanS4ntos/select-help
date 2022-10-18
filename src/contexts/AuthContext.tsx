@@ -1,4 +1,7 @@
+import axios from "axios";
 import { createContext, useEffect, useState } from "react";
+import { Alert } from "react-native";
+import { API } from "../services/api";
 
 interface AuthContextProviderProps {
   children: JSX.Element;
@@ -9,9 +12,12 @@ interface LoginProps {
   password: string;
 }
 
-interface UserProps {
-  userID: string;
+export interface UserProps {
+  name: string;
   email: string;
+  password: string;
+  admin: boolean;
+  projects: [];
 }
 
 interface AuthContextProps {
@@ -30,18 +36,36 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<UserProps>();
 
   async function handleLogin({ email, password }: LoginProps) {
-    const userID = "teste@123";
-    const user: UserProps = { email, userID };
-    setUser(user);
-    setIsLogged(true);
-    localStorage.setItem("token", userID);
+    setIsLoading(true);
+
+    await API()
+      .get<UserProps>("/user")
+      .then((response) => {
+        const user: UserProps = {
+          name: response.data.name,
+          email: response.data.email,
+          password: response.data.password,
+          admin: response.data.admin,
+          projects: response.data.projects,
+        };
+        setUser(user);
+        setIsLogged(true);
+      })
+      .catch((error) =>
+        Alert.alert(
+          "Erro",
+          "Ocorreu um erro ao realizar login. Verifique as credenciais e tente novamente."
+        )
+      )
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   async function handleLogout() {
     setUser(undefined);
     setIsLoading(false);
     setIsLogged(false);
-    localStorage.removeItem("token");
   }
 
   // useEffect(() => {

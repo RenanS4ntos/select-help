@@ -36,7 +36,7 @@ export function ProjectItems({ data, ...rest }: Props) {
 
         <VStack flex={1} my={5} ml={5} alignItems="center">
           <Text color="white" fontSize="md">
-            {data.title}
+            {data?.name}
           </Text>
         </VStack>
       </HStack>

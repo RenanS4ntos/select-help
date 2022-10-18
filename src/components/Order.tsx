@@ -22,8 +22,7 @@ type Props = IPressableProps & {
 export function Order({ data, ...rest }: Props) {
   const { colors } = useTheme();
 
-  const statusColor =
-    data.status === "open" ? colors.secondary[700] : colors.green[300];
+  const statusColor = !data.status ? colors.secondary[700] : colors.green[300];
 
   return (
     <Pressable {...rest}>
@@ -39,18 +38,18 @@ export function Order({ data, ...rest }: Props) {
 
         <VStack flex={1} my={5} ml={5}>
           <Text color="white" fontSize="md">
-            {data.title}
+            {data.name}
           </Text>
           <HStack alignItems="center">
             <ClockAfternoon size={15} color={colors.gray[300]} />
             <Text color="gray.200" fontSize="xs" ml={1}>
-              {data.when}
+              {data.solution_date}
             </Text>
           </HStack>
         </VStack>
 
         <Circle bg="gray.500" h={12} w={12} mr={5}>
-          {data.status === "closed" ? (
+          {data.status ? (
             <CircleWavyCheck size={24} color={statusColor} />
           ) : (
             <Hourglass size={24} color={statusColor} />

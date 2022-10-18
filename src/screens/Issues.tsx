@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   HStack,
   IconButton,
@@ -20,8 +20,18 @@ import { Button } from "../components/Button";
 import { Loading } from "../components/Loading";
 import { Order } from "../components/Order";
 import { OrderProps } from "../interfaces";
+import { useAuth } from "../hooks";
+import axios from "axios";
+import { API } from "../services/api";
+
+export interface RouteParams {
+  projectId: string;
+}
 
 export function Issues() {
+  const route = useRoute();
+  const { projectId } = route.params as RouteParams;
+  const { handleLogout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [statusSelected, setStatusSelected] = useState<"open" | "closed">(
     "open"
@@ -31,12 +41,22 @@ export function Issues() {
   const navigation = useNavigation();
   const { colors } = useTheme();
 
+  useEffect(() => {
+    async function LoadData() {
+      await API()
+        .get(`/solicitation/${projectId}`)
+        .then((response) => setOrders(response.data));
+    }
+
+    LoadData();
+  }, [orders]);
+
   function handleNewOrder() {
-    navigation.navigate("new");
+    navigation.navigate("new", { projectId });
   }
 
-  function handleOpenDetails(orderId: string) {
-    navigation.navigate("details", { orderId });
+  function handleOpenDetails(order: OrderProps) {
+    navigation.navigate("details", { order, projectId });
   }
 
   return (
@@ -55,7 +75,7 @@ export function Issues() {
         <IconButton
           icon={<SignOut size={26} color={colors.gray[300]} />}
           onPress={() => {
-            console.log("saoiu");
+            handleLogout();
           }}
         />
       </HStack>
@@ -95,7 +115,7 @@ export function Issues() {
             data={orders}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <Order data={item} onPress={() => handleOpenDetails(item.id)} />
+              <Order data={item} onPress={() => handleOpenDetails(item)} />
             )}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100 }}

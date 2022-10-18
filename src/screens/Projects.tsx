@@ -18,13 +18,37 @@ import { Loading } from "../components/Loading";
 import { Order } from "../components/Order";
 import { OrderProps, ProjectsProps } from "../interfaces";
 import { ProjectItems } from "../components/ProjectItems";
+import { useAuth } from "../hooks";
+import axios from "axios";
+import { Alert } from "react-native";
+import { API } from "../services/api";
 
 export function Projects() {
+  const { handleLogout, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [projects, setProjects] = useState<ProjectsProps[]>([]);
 
   const navigation = useNavigation();
   const { colors } = useTheme();
+
+  useEffect(() => {
+    async function LoadData() {
+      setIsLoading(true);
+      await API()
+        .get("/user", {
+          headers: { email: user?.email },
+        })
+        .then((response) => {
+          setProjects(response.data.projects);
+        })
+        .catch((err) => {
+          Alert.alert("Erro", "Ocorreu um erro ao buscar os projetos.");
+        })
+        .finally(() => setIsLoading(false));
+    }
+
+    LoadData();
+  }, []);
 
   function handleOpenDetails(projectId: string) {
     navigation.navigate("issues", { projectId });
@@ -46,7 +70,7 @@ export function Projects() {
         <IconButton
           icon={<SignOut size={26} color={colors.gray[300]} />}
           onPress={() => {
-            console.log("saoiu");
+            handleLogout();
           }}
         />
       </HStack>

@@ -1,18 +1,14 @@
 export interface OrderProps {
   id: string;
-  title: string;
-  when: string;
-  status: "open" | "closed";
+  name: string;
+  description: string;
+  solution: string;
+  solution_date: string;
+  status: boolean;
 }
 
 export interface ProjectsProps {
   id: string;
-  title: string;
-  orders: OrderProps[];
-}
-
-export interface EnterpriseProps {
-  id: string;
   name: string;
-  projects: ProjectsProps[];
+  solicitations: OrderProps[];
 }
